@@ -56,3 +56,6 @@ TARGET_DATA_INPUTS 10 // Number of data inputs consumer will take before exittin
     * Sleep for some random time <= MAX_WAIT_TIME
 * Signal completion for producer
 * Unlink from shared memory and exit
+
+## Sample runs (from local machine)
+Sample runs were performed 1 after the other, allowing time for both processes to finish normally. The logs of each run are stored in sampleRun1.log , sampleRun2.log , sampleRun3.log in the root directory of this github repository.
