@@ -7,3 +7,42 @@ The Producer-Consumer problem is generally implemented using a shared memory reg
 The shared memory region is created using shm_open(...) and closed using shm_unlink(...), whilst the access to the shared memory is done using mmap(...) and munmap(...), and ftruncate(...) is used to re-size the shared memory region. Each of the processes' states are output to the terminal where the processes are launched, where, for convenience, the producer and consumer processes identify their respective outputs by starting each line with 'Producer - ' and 'Consumer - '. The random function rand() used to generate the sample strings is initialized with a seed of the current time, in seconds, at the start of the processes' executions. Within the shared memory region, alongside the synchronization integer, the semaphore, and the shared data array, the memory region also contains the position in the array where both the producer and consumer would be accessing, and a 'isFull' variable used to track the state of the shared array to maximize the utilization (eg. to not leave an empty object in the shared array). Additionally, alongside the upper limit on memory access attempts, we also define a maximum wait time of 3 seconds between accesses - determined randomly each time exclusive access is gained to the shared memory, and a maximum amount of times either program will attempt to wait before continuing as if the programs are in a 'failure' state. The shared memory bridge is named 'PROD_CONS_EG_BRIDGE', and the synchronization variable is defined as 10 - an arbitrary decision, the value itself does not necessarily matter. 
 
 All variables discussed above are defined at compile time, and cannot be changed without re-compiling the programs. All 'structural' contants MUST be the same in the producer and the consumer programs. (Namely 'MEM_BRIDGE_NAME','SYNC_VAL','SHARED_DATA_ARRAY_LENGTH','RANDOM_STRING_LENGTH'), however, other constants, such as ('SHARED_MEM_ACCESSES','RANDOM_STRING_ALLOWED_CHARS','MAX_WAIT_TIME','EXTERNAL_STATE_CHECKS','TARGET_DATA_OUTPUTS'/'TARGET_DATA_INPUTS') may be changed on a per-program basis. 
+
+# Implementation Details
+## Variable Definitions
+MEM_BRIDGE_NAME "PROD_CONS_EG_BRIDGE" // Name of shared memory file (in /dev/shm on linux)
+SYNC_VAL 10 // Integer value used to validate state of shared memory
+SHARED_DATA_ARRAY_LENGTH 2 // As defined by assignment parameters
+SHARED_MEM_ACCESSES 20 // Max amount of times producer will attempt to add data to shared data array
+RANDOM_STRING_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyz1234567890" // Allowed characters for random sample strings - alpha-numeric here
+RANDOM_STRING_LENGTH 10 // Number of allowed characters in each sample string (actual char array length is n+1, as \0 terminating char needed)
+RNG_SEED time(NULL) // Seed used for random sample strings and wait times
+MAX_WAIT_TIME 3 // Maximum number of seconds producer will wait before attempting to put more data in the shared data array (will be randomly determined each time)
+EXTERNAL_EXEC_STATE_CHECKS 3 // Number of MAX_WAIT_TIME's program will wait before assuming other program has failed
+TARGET_DATA_OUTPUTS 10 // Maximum amount of objects producer will place into shared meemory (producer may place less if it is unable to place more)
+TARGET_DATA_INPUTS 10 // Number of data inputs consumer will take before exitting (may be less if producer does not fill array quickly)
+
+## Algorithm used (Producer process)
+* Producer initializes memory (or re-initializes if it already exists and no other process is using it)
+* Attempt to add data to array SHARED_MEM_ACCESSES times:
+    * Ensure no other processes are requesting an 'alive' check - Resume when check completed
+    * Wait for exclusive access to shared memory by waiting for semaphore
+    * Check if array is full (will skip current access attempt) or if it isn't (will proceed with adding data to array)
+    * Write random character string to array and output current state
+    * Release semaphore for other process
+    * Sleep for some random time <= MAX_WAIT_TIME
+* Wait for consumer to signal completion (while also checking if consumer process is still 'alive')
+* Cleanup shared memory and exit
+
+## Algorithm used (Consumer process)
+* Consumer await memory initialization (ensuring producer is making progress on initalization)
+* Attempt to remove data from array SHARED_MEM_ACCESSES times:
+    * Ensure no other processes are requesting an 'alive' check - Resume when check completed
+    * Wait for exclusive access to shared memory by waiting for semaphore
+    * Check if array is empty (will skip current access attempt) or if it isn't (will proceed with removing data from array)
+    * Copies data out of shared array
+    * Clears array using 'space' chars
+    * Release semaphore for other processes
+    * Sleep for some random time <= MAX_WAIT_TIME
+* Signal completion for producer
+* Unlink from shared memory and exit
