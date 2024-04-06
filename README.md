@@ -71,4 +71,7 @@ gcc consumer.c -pthread -lrt -o consumer
 ```
 Thus, for convinence, two scripts have been included : './buildScript.sh' and './runScript.sh', used to compile and execute the Producer-Consumer problem. Unfortunately, only scripts for linux are included, and to execute the scripts, you may need to run 'chmod +x ./*.sh' in the root directory of this github repo. (WARNING : DO NOT RUN COMMANDS YOU DO NOT UNDERSTAND.)
 
-Producer-Consumer implementation tested with gcc v13.2.0 // gcc (Ubuntu 13.2.0-4ubuntu3) 13.2.0. 
+Producer-Consumer implementation tested locally with gcc v13.2.0 // gcc (Ubuntu 13.2.0-4ubuntu3) 13.2.0. 
+
+# Real-world usage
+As implemented here, the program simulates a message-passing situation, where the producer sends messages into a buffer and the consumer 'recieves' messages from the buffer and removes the recieved message from the buffer. With some modification, this code can be used to implement this message passing between 2 processes, however, this is a very simple one-way bridge (only one process can send messages and only one message can recieve messages, and the implementation is not bidirectional). 
