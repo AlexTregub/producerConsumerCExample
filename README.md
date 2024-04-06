@@ -11,15 +11,25 @@ All variables discussed above are defined at compile time, and cannot be changed
 # Implementation Details
 ## Variable Definitions
 MEM_BRIDGE_NAME "PROD_CONS_EG_BRIDGE" // Name of shared memory file (in /dev/shm on linux)
+
 SYNC_VAL 10 // Integer value used to validate state of shared memory
+
 SHARED_DATA_ARRAY_LENGTH 2 // As defined by assignment parameters
+
 SHARED_MEM_ACCESSES 20 // Max amount of times producer will attempt to add data to shared data array
+
 RANDOM_STRING_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyz1234567890" // Allowed characters for random sample strings - alpha-numeric here
+
 RANDOM_STRING_LENGTH 10 // Number of allowed characters in each sample string (actual char array length is n+1, as \0 terminating char needed)
+
 RNG_SEED time(NULL) // Seed used for random sample strings and wait times
+
 MAX_WAIT_TIME 3 // Maximum number of seconds producer will wait before attempting to put more data in the shared data array (will be randomly determined each time)
+
 EXTERNAL_EXEC_STATE_CHECKS 3 // Number of MAX_WAIT_TIME's program will wait before assuming other program has failed
+
 TARGET_DATA_OUTPUTS 10 // Maximum amount of objects producer will place into shared meemory (producer may place less if it is unable to place more)
+
 TARGET_DATA_INPUTS 10 // Number of data inputs consumer will take before exitting (may be less if producer does not fill array quickly)
 
 ## Algorithm used (Producer process)
