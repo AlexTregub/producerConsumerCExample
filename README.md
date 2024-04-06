@@ -10,6 +10,7 @@ All variables discussed above are defined at compile time, and cannot be changed
 
 # Implementation Details
 ## Variable Definitions
+```
 MEM_BRIDGE_NAME "PROD_CONS_EG_BRIDGE" // Name of shared memory file (in /dev/shm on linux)
 
 SYNC_VAL 10 // Integer value used to validate state of shared memory
@@ -31,6 +32,7 @@ EXTERNAL_EXEC_STATE_CHECKS 3 // Number of MAX_WAIT_TIME's program will wait befo
 TARGET_DATA_OUTPUTS 10 // Maximum amount of objects producer will place into shared meemory (producer may place less if it is unable to place more)
 
 TARGET_DATA_INPUTS 10 // Number of data inputs consumer will take before exitting (may be less if producer does not fill array quickly)
+```
 
 ## Algorithm used (Producer process)
 * Producer initializes memory (or re-initializes if it already exists and no other process is using it)
@@ -59,3 +61,14 @@ TARGET_DATA_INPUTS 10 // Number of data inputs consumer will take before exittin
 
 ## Sample runs (from local machine)
 Sample runs were performed 1 after the other, allowing time for both processes to finish normally. The logs of each run are stored in sampleRun1.log , sampleRun2.log , sampleRun3.log in the root directory of this github repository.
+
+# Execution Details
+As defined by the problem specifications, we expect the programs to be built via the following commands:
+```
+gcc producer.c -pthread -lrt -o producer
+gcc consumer.c -pthread -lrt -o consumer
+./producer & ./consumer &
+```
+Thus, for convinence, two scripts have been included : './buildScript.sh' and './runScript.sh', used to compile and execute the Producer-Consumer problem. Unfortunately, only scripts for linux are included, and to execute the scripts, you may need to run 'chmod +x ./*.sh' in the root directory of this github repo. (WARNING : DO NOT RUN COMMANDS YOU DO NOT UNDERSTAND.)
+
+Producer-Consumer implementation tested with gcc v13.2.0 // gcc (Ubuntu 13.2.0-4ubuntu3) 13.2.0. 
